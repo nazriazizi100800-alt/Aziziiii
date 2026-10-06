@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy 23rd Birthday My Sayang 🤍</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Montserrat:wght@300;400;500;600&family=Great+Vibes&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: #fcfbf9;
+            color: #4a4a4a;
+            overflow-x: hidden;
+        }
+        .font-serif-custom {
+            font-family: 'Cormorant Garamond', serif;
+        }
+        .font-cursive {
+            font-family: 'Great Vibes', cursive;
+        }
+
+        /* Floating Sparkling White Hearts Canvas */
+        #heartCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        /* Interactive Envelope Styles */
+        .envelope-wrapper {
+            perspective: 1000px;
+            cursor: pointer;
+        }
+        
+        .envelope {
+            width: 320px;
+            height: 220px;
+            background-color: #ffffff;
+            position: relative;
+            border-radius: 8px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.05), 0 5px 15px rgba(0, 0, 0, 0.03);
+            transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.6s;
+            border: 1px solid #f0ede6;
+        }
+
+        .envelope:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.08), 0 10px 20px rgba(0, 0, 0, 0.04);
+        }
+
+        /* Envelope Flap */
+        .envelope-flap {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 0;
+            height: 0;
+            border-left: 160px solid transparent;
+            border-right: 160px solid transparent;
+            border-top: 120px solid #f7f5f0;
+            transform-origin: top;
+            transition: transform 0.6s ease-in-out, z-index 0.6s;
+            z-index: 3;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.03));
+        }
+
+        .envelope.open .envelope-flap {
+            transform: rotateX(180deg);
+            z-index: 1;
+        }
+
+        .envelope-pocket {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 0;
+            border-left: 160px solid #ffffff;
+            border-right: 160px solid #ffffff;
+            border-bottom: 120px solid #fcfbfa;
+            border-radius: 0 0 8px 8px;
+            z-index: 2;
+        }
+
+        /* Letter Card inside envelope */
+        .letter-preview {
+            position: absolute;
+            bottom: 15px;
+            left: 20px;
+            right: 20px;
+            height: 180px;
+            background: #ffffff;
+            border-radius: 4px;
+            z-index: 2;
+            transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+            border: 1px solid #f3eff0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+        }
+
+        .envelope.open .letter-preview {
+            transform: translateY(-100px);
+        }
+
+        /* Wax Seal Accent */
+        .wax-seal {
+            position: absolute;
+            top: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #ffffff 0%, #f4f0ea 100%);
+            border: 2px solid #e8e2d8;
+            border-radius: 50%;
+            z-index: 4;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+            transition: opacity 0.4s ease, transform 0.4s ease;
+        }
+
+        .envelope.open .wax-seal {
+            opacity: 0;
+            transform: translateX(-50%) scale(0.5);
+            pointer-events: none;
+        }
+
+        /* Subtle Glow Animation */
+        @keyframes subtleGlow {
+            0%, 100% { opacity: 0.6; filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.8)); }
+            50% { opacity: 0.9; filter: drop-shadow(0 0 25px rgba(255, 255, 255, 1)); }
+        }
+
+        .glow-effect {
+            animation: subtleGlow 4s infinite ease-in-out;
+        }
+
+        /* Letter Reveal Animation */
+        .letter-content-wrapper {
+            opacity: 0;
+            transform: translateY(30px) scale(0.98);
+            transition: opacity 1.2s ease-out, transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .letter-content-wrapper.visible {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #fcfbf9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #e2ded7;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between items-center relative selection:bg-gray-100">
+
+    <canvas id="heartCanvas"></canvas>
+
+    <!-- Top Action Controls (Audio & Edit Buttons) -->
+    <div class="fixed top-6 right-6 z-50 flex items-center gap-3">
+        <!-- Edit Mode Toggle Button -->
+        <button id="editToggleBtn" class="bg-white/80 backdrop-blur-md border border-gray-200 text-gray-600 p-3 rounded-full shadow-sm hover:shadow-md hover:bg-white transition-all duration-300 flex items-center justify-center group" title="Customize Letter">
+            <svg class="w-5 h-5 text-gray-500 group-hover:text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+            </svg>
+            <span class="max-w-0 overflow-hidden whitespace-nowrap group-hover:max-w-xs transition-all duration-500 ease-in-out text-xs font-light text-gray-500 ml-0 group-hover:ml-2">Edit Mode</span>
+        </button>
+
+        <!-- Audio Control Floating Button -->
+        <button id="audioToggleBtn" class="bg-white/80 backdrop-blur-md border border-gray-200 text-gray-600 p-3 rounded-full shadow-sm hover:shadow-md hover:bg-white transition-all duration-300 flex items-center justify-center group" title="Toggle Soft Piano Music">
+            <svg id="musicIcon" class="w-5 h-5 text-gray-500 group-hover:text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 .895-2 3-2 3 .895 3 2zm12 0c0 1.105-1.343 2-3 2s-3-.895-3-2 .895-2 3-2 3 .895 3 2zM9 10l12-3"></path>
+            </svg>
+            <span id="audioStatusText" class="max-w-0 overflow-hidden whitespace-nowrap group-hover:max-w-xs transition-all duration-500 ease-in-out text-xs font-light text-gray-500 ml-0 group-hover:ml-2">Sound On</span>
+        </button>
+    </div>
+
+    <!-- PASSWORD MODAL / GATE -->
+    <div id="passwordModal" class="fixed inset-0 bg-white/95 backdrop-blur-md z-50 flex items-center justify-center p-4 transition-opacity duration-500">
+        <div class="max-w-md w-full bg-white p-8 rounded-2xl border border-gray-100 shadow-xl text-center relative overflow-hidden">
+            <div class="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4 border border-gray-100 text-2xl">
+                🤍
+            </div>
+            <h2 class="font-serif-custom text-2xl text-gray-800 font-normal mb-2">Enter Password</h2>
+            <p class="text-xs text-gray-400 font-light mb-6">Enter secret passcode to view the letter for Sayang</p>
+            
+            <form id="passwordForm" onsubmit="handlePasswordSubmit(event)">
+                <input type="password" id="passInput" placeholder="Enter password..." class="w-full px-4 py-3 rounded-xl border border-gray-200 text-center text-sm focus:outline-none focus:border-gray-400 transition-colors mb-4 bg-gray-50/50" autofocus>
+                <p id="passError" class="text-xs text-red-400 hidden mb-4">Incorrect password. Please try again 🤍</p>
+                <button type="submit" class="w-full py-3 bg-gray-800 hover:bg-gray-900 text-white text-xs uppercase tracking-widest rounded-xl transition-all shadow-sm">
+                    Unlock Surprise
+                </button>
+            </form>
+            <p class="text-[10px] text-gray-300 mt-6 uppercase tracking-wider">Default Password: <span class="font-semibold text-gray-400">sayang</span></p>
+        </div>
+    </div>
+
+    <!-- EDIT MODAL -->
+    <div id="editModal" class="fixed inset-0 bg-black/30 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden transition-opacity duration-300">
+        <div class="max-w-xl w-full bg-white rounded-2xl border border-gray-100 shadow-2xl p-6 sm:p-8 max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-6 pb-4 border-b border-gray-100">
+                <h3 class="font-serif-custom text-2xl text-gray-800">Customize Letter Content</h3>
+                <button id="closeEditBtn" class="text-gray-400 hover:text-gray-600 text-xl">&times;</button>
+            </div>
+
+            <div class="space-y-5">
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-gray-500 mb-1">Passcode Password</label>
+                    <input type="text" id="editPasswordInput" class="w-full p-3 text-sm border border-gray-200 rounded-xl focus:outline-none focus:border-gray-400">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-gray-500 mb-1">Replace Image</label>
+                    <input type="file" id="editImageInput" accept="image/*" class="w-full text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-medium file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200 cursor-pointer">
+                    <p class="text-[11px] text-gray-400 mt-1">Upload a photo from your computer/device.</p>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-gray-500 mb-1">Letter Content Text</label>
+                    <textarea id="editTextarea" rows="12" class="w-full p-4 text-sm font-serif-custom text-gray-800 border border-gray-200 rounded-xl focus:outline-none focus:border-gray-400 leading-relaxed"></textarea>
+                </div>
+
+                <div class="flex gap-3 pt-2">
+                    <button id="resetDefaultsBtn" type="button" class="px-4 py-3 bg-gray-100 hover:bg-gray-200 text-gray-600 text-xs uppercase tracking-wider rounded-xl transition-all">
+                        Reset Defaults
+                    </button>
+                    <button id="saveEditBtn" type="button" class="flex-1 py-3 bg-gray-800 hover:bg-gray-900 text-white text-xs uppercase tracking-wider rounded-xl transition-all shadow-sm font-medium">
+                        Save Changes
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <main class="w-full min-h-screen flex flex-col items-center justify-center p-4 sm:p-6 z-20">
+        
+        <!-- INTRO SCREEN: Closed Envelope -->
+        <div id="envelopeSection" class="flex flex-col items-center justify-center transition-all duration-700 ease-in-out">
+            <p class="font-serif-custom italic text-xl sm:text-2xl text-gray-500 mb-8 tracking-wide text-center glow-effect">
+                You've received a letter...
+            </p>
+
+            <div class="envelope-wrapper" id="envelopeWrapper">
+                <div class="envelope" id="envelope">
+                    <div class="envelope-flap"></div>
+                    <div class="envelope-pocket"></div>
+                    <div class="letter-preview flex flex-col items-center justify-center p-4 text-center">
+                        <span class="font-serif-custom text-gray-400 text-xs uppercase tracking-widest mb-1">For Someone Special</span>
+                        <div class="w-8 h-px bg-gray-200 my-2"></div>
+                        <span class="font-cursive text-2xl text-gray-700">Sayang</span>
+                    </div>
+                    <div class="wax-seal">
+                        <span class="text-gray-400 text-sm">🤍</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Envelope Label & Button -->
+            <div class="mt-10 text-center">
+                <p class="font-serif-custom text-2xl sm:text-3xl font-light text-gray-800 tracking-wide mb-6">
+                    To: My Sayang 🤍
+                </p>
+                
+                <button id="openBtn" class="px-8 py-3 bg-white text-gray-700 text-sm tracking-widest uppercase rounded-full border border-gray-200 shadow-sm hover:shadow-md hover:border-gray-300 hover:bg-gray-50 transition-all duration-300 transform hover:-translate-y-0.5">
+                    Open Letter
+                </button>
+            </div>
+        </div>
+
+        <!-- REVEALED LETTER SECTION -->
+        <div id="letterSection" class="hidden w-full max-w-2xl my-8 sm:my-12">
+            <div id="letterCard" class="letter-content-wrapper bg-white/90 backdrop-blur-md border border-gray-100 rounded-2xl p-6 sm:p-10 md:p-12 shadow-xl shadow-gray-100/50 relative">
+                
+                <!-- Delicate top decorative header -->
+                <div class="flex flex-col items-center justify-center mb-8 border-b border-gray-100 pb-8">
+                    <span class="text-xs uppercase tracking-widest font-light text-gray-400 mb-2">Happy 23rd Birthday</span>
+                    <h1 class="font-serif-custom text-3xl sm:text-4xl text-gray-800 font-normal italic tracking-wide text-center">
+                        My Dearest Sayang 🤍
+                    </h1>
+                </div>
+
+                <!-- Picture Card -->
+                <div class="mb-10 flex justify-center">
+                    <div class="relative p-2.5 bg-white border border-gray-100 rounded-xl shadow-md transform -rotate-1 hover:rotate-0 transition-transform duration-500 max-w-sm w-full">
+                        <div class="overflow-hidden rounded-lg aspect-[3/4] bg-gray-50 relative">
+                            <img id="displayImage"
+                                 src="WhatsApp Image 2026-10-06 at 9.46.45 PM.jpg" 
+                                 alt="My Sayang" 
+                                 class="w-full h-full object-cover object-center transform hover:scale-105 transition-transform duration-700"
+                                 onerror="this.onerror=null; this.src='https://placehold.co/600x800/f8f6f0/777777?text=My+Sayang+🤍';"
+                            />
+                        </div>
+                        <p class="text-center font-cursive text-xl text-gray-500 mt-3 mb-1">
+                            Happy 23rd Birthday Sayang ✨
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Main Letter Body Text -->
+                <div id="displayText" class="font-serif-custom text-lg sm:text-xl leading-relaxed text-gray-700 space-y-6 whitespace-pre-line text-justify font-normal"></div>
+
+                <!-- Letter Footer Signoff -->
+                <div class="mt-12 pt-6 border-t border-gray-100 flex flex-col items-end">
+                    <span class="font-serif-custom italic text-gray-500 text-lg">Forever Yours,</span>
+                    <span class="font-cursive text-3xl text-gray-800 mt-1">Your Love 🤍</span>
+                </div>
+
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="w-full py-6 text-center text-xs text-gray-400 font-light z-20">
+        Crafted with love for your special day 🤍
+    </footer>
+
+    <script>
+        // DEFAULT DATA
+        const DEFAULT_PASSWORD = "sayang";
+        const DEFAULT_TEXT = `Happy 23rd birthday sayang. Hopefully, dengan bertambahnya umur awak ni, dapat jadikan kita makin dekat dengan each other untuk bergelar suami isteri. Semoga kita lebih kenal antara satu sama lain, so that kita boleh faham each other better. Okay that's for us. Untuk awak pulak, saya doakan semoga segala apa yang awak akan lalui lepasni akan dipermudahkan. Just in case if things does not go as what we hoped for, just have faith. Percaya ada benda yang lebih baik untuk kita. So, just let it be! and keep the positivity within you. *A reminder for me as well
+
+Another thing is, semoga dengan hadirnya saya dalam hidup awak ni, dapat bagi kesenangan dekat awak. Bukan setakat kesenangan dari segi material semata (which is tak jugak sebab saya tak kaya), tapi kesenangan dari segi emosi and any kind of benefits yang saya boleh bagi dekat awak. 
+
+Thank you sebab dah jadi peneman saya selama ni. Thank you sebab dah masakkan sedap sedap untuk saya, belikan macam macam, suprisekan saya dengan makanan or air bila saya balik kerja (back when you are here) and apa segala benda yang awak bagi kat saya lah. Oh, shoutout untuk handcraft yang awak buat kat saya, which I still keep it until now. Thanks for that and I think it values more that any kind of expensive things out there. I am just glad to have a girlfriend yang sangat talented untuk buat semua tu and what matter the most is your effort to do it. I love you sayang! Just to let you know that, I appreciate those mentioned things so much, that I can imagine how my life is like when we already become a husband and wife. 
+
+Again, happy birthday sayang. This time, I bought you an electric scooter untuk memudahkan awak pergi mana mana je within campus. So after this, awak tak perlu risau dah lah nak dapat mahallah jauh ke dekat. I mean, dekat is always better but, at least kalau jauh, ada lah transportation yang boleh juga. And, tak perlu transporter dah. Wishing you all the best onwards! Sorry I cannot be there by your side masa birthday awak. I love you sayang! 🤍`;
+
+        // APP STATE & LOCALSTORAGE
+        let currentPassword = localStorage.getItem('sayang_letter_pass') || DEFAULT_PASSWORD;
+        let currentText = localStorage.getItem('sayang_letter_text') || DEFAULT_TEXT;
+        let currentImage = localStorage.getItem('sayang_letter_img') || "WhatsApp Image 2026-10-06 at 9.46.45 PM.jpg";
+
+        // DOM ELEMENTS
+        const displayTextEl = document.getElementById('displayText');
+        const displayImageEl = document.getElementById('displayImage');
+
+        function loadLetterData() {
+            displayTextEl.textContent = currentText;
+            displayImageEl.src = currentImage;
+        }
+
+        loadLetterData();
+
+        // PASSWORD LOGIC
+        function handlePasswordSubmit(e) {
+            e.preventDefault();
+            const inputVal = document.getElementById('passInput').value;
+            const passError = document.getElementById('passError');
+
+            if (inputVal.trim().toLowerCase() === currentPassword.trim().toLowerCase()) {
+                const passModal = document.getElementById('passwordModal');
+                passModal.style.opacity = '0';
+                setTimeout(() => {
+                    passModal.classList.add('hidden');
+                }, 500);
+            } else {
+                passError.classList.remove('hidden');
+            }
+        }
+
+        /* Edit Modal Interactions */
+        const editToggleBtn = document.getElementById('editToggleBtn');
+        const editModal = document.getElementById('editModal');
+        const closeEditBtn = document.getElementById('closeEditBtn');
+        const editPasswordInput = document.getElementById('editPasswordInput');
+        const editTextarea = document.getElementById('editTextarea');
+        const editImageInput = document.getElementById('editImageInput');
+        const saveEditBtn = document.getElementById('saveEditBtn');
+        const resetDefaultsBtn = document.getElementById('resetDefaultsBtn');
+
+        editToggleBtn.addEventListener('click', () => {
+            editPasswordInput.value = currentPassword;
+            editTextarea.value = currentText;
+            editModal.classList.remove('hidden');
+        });
+
+        closeEditBtn.addEventListener('click', () => {
+            editModal.classList.add('hidden');
+        });
+
+        let uploadedImageBase64 = null;
+        editImageInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(evt) {
+                    uploadedImageBase64 = evt.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        saveEditBtn.addEventListener('click', () => {
+            currentPassword = editPasswordInput.value.trim() || DEFAULT_PASSWORD;
+            currentText = editTextarea.value.trim() || DEFAULT_TEXT;
+            if (uploadedImageBase64) {
+                currentImage = uploadedImageBase64;
+                localStorage.setItem('sayang_letter_img', currentImage);
+            }
+
+            localStorage.setItem('sayang_letter_pass', currentPassword);
+            localStorage.setItem('sayang_letter_text', currentText);
+
+            loadLetterData();
+            editModal.classList.add('hidden');
+        });
+
+        resetDefaultsBtn.addEventListener('click', () => {
+            localStorage.removeItem('sayang_letter_pass');
+            localStorage.removeItem('sayang_letter_text');
+            localStorage.removeItem('sayang_letter_img');
+
+            currentPassword = DEFAULT_PASSWORD;
+            currentText = DEFAULT_TEXT;
+            currentImage = "WhatsApp Image 2026-10-06 at 9.46.45 PM.jpg";
+
+            loadLetterData();
+            editModal.classList.add('hidden');
+        });
+
+        /* Floating Sparkling White Hearts Canvas */
+        const canvas = document.getElementById('heartCanvas');
+        const ctx = canvas.getContext('2d');
+
+        let width = canvas.width = window.innerWidth;
+        let height = canvas.height = window.innerHeight;
+
+        window.addEventListener('resize', () => {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        });
+
+        class ParticleHeart {
+            constructor() {
+                this.reset();
+            }
+
+            reset() {
+                this.x = Math.random() * width;
+                this.y = height + Math.random() * 50;
+                this.size = Math.random() * 12 + 6;
+                this.speedY = Math.random() * 0.8 + 0.3;
+                this.speedX = (Math.random() - 0.5) * 0.4;
+                this.opacity = Math.random() * 0.5 + 0.2;
+                this.sparklePhase = Math.random() * Math.PI * 2;
+            }
+
+            update() {
+                this.y -= this.speedY;
+                this.x += this.speedX + Math.sin(this.y * 0.01) * 0.2;
+                this.sparklePhase += 0.03;
+
+                this.currentOpacity = this.opacity + Math.sin(this.sparklePhase) * 0.25;
+                if (this.currentOpacity < 0) this.currentOpacity = 0;
+
+                if (this.y < -20) {
+                    this.reset();
+                }
+            }
+
+            draw() {
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.scale(this.size / 20, this.size / 20);
+                
+                ctx.fillStyle = `rgba(255, 255, 255, ${this.currentOpacity})`;
+                ctx.shadowColor = 'rgba(255, 255, 255, 0.9)';
+                ctx.shadowBlur = 8;
+
+                ctx.beginPath();
+                ctx.moveTo(0, 0);
+                ctx.bezierCurveTo(-10, -10, -20, 5, 0, 18);
+                ctx.bezierCurveTo(20, 5, 10, -10, 0, 0);
+                ctx.fill();
+
+                ctx.restore();
+            }
+        }
+
+        const particles = [];
+        for (let i = 0; i < 35; i++) {
+            particles.push(new ParticleHeart());
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, width, height);
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+            requestAnimationFrame(animateParticles);
+        }
+
+        animateParticles();
+
+        /* Ambient Piano Audio Synthesizer (Web Audio API) */
+        class CalmPianoSynth {
+            constructor() {
+                this.audioCtx = null;
+                this.isPlaying = false;
+                this.volume = 0.12; // Low soft volume so as not to disturb reading
+                this.timer = null;
+                this.notes = [261.63, 293.66, 329.63, 392.00, 440.00, 523.25, 587.33, 659.25, 783.99];
+            }
+
+            init() {
+                if (!this.audioCtx) {
+                    const AudioContext = window.AudioContext || window.webkitAudioContext;
+                    this.audioCtx = new AudioContext();
+                }
+            }
+
+            playNote(freq, duration = 4.0) {
+                if (!this.audioCtx || !this.isPlaying) return;
+
+                const osc = this.audioCtx.createOscillator();
+                const gain = this.audioCtx.createGain();
+
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(freq, this.audioCtx.currentTime);
+
+                const now = this.audioCtx.currentTime;
+                gain.gain.setValueAtTime(0, now);
+                gain.gain.linearRampToValueAtTime(this.volume, now + 0.15);
+                gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+
+                osc.connect(gain);
+                gain.connect(this.audioCtx.destination);
+
+                osc.start(now);
+                osc.stop(now + duration);
+            }
+
+            start() {
+                this.init();
+                if (this.audioCtx.state === 'suspended') {
+                    this.audioCtx.resume();
+                }
+                this.isPlaying = true;
+                this.scheduleNextNote();
+            }
+
+            stop() {
+                this.isPlaying = false;
+                if (this.timer) clearTimeout(this.timer);
+            }
+
+            scheduleNextNote() {
+                if (!this.isPlaying) return;
+
+                const note = this.notes[Math.floor(Math.random() * this.notes.length)];
+                this.playNote(note, 4.5);
+
+                if (Math.random() > 0.5) {
+                    const harmonicNote = this.notes[Math.floor(Math.random() * this.notes.length)];
+                    setTimeout(() => {
+                        this.playNote(harmonicNote, 4.0);
+                    }, 300);
+                }
+
+                const delay = Math.random() * 1800 + 1200;
+                this.timer = setTimeout(() => this.scheduleNextNote(), delay);
+            }
+        }
+
+        const pianoSynth = new CalmPianoSynth();
+
+        /* Audio Toggle Button Logic */
+        const audioBtn = document.getElementById('audioToggleBtn');
+        const audioStatus = document.getElementById('audioStatusText');
+        let audioEnabled = true;
+
+        audioBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            audioEnabled = !audioEnabled;
+            if (audioEnabled) {
+                pianoSynth.start();
+                audioStatus.textContent = 'Sound On';
+                audioBtn.style.opacity = '1';
+            } else {
+                pianoSynth.stop();
+                audioStatus.textContent = 'Muted';
+                audioBtn.style.opacity = '0.6';
+            }
+        });
+
+        /* Letter Opening Interaction */
+        const envelopeWrapper = document.getElementById('envelopeWrapper');
+        const envelope = document.getElementById('envelope');
+        const openBtn = document.getElementById('openBtn');
+        const envelopeSection = document.getElementById('envelopeSection');
+        const letterSection = document.getElementById('letterSection');
+        const letterCard = document.getElementById('letterCard');
+
+        function triggerLetterOpen() {
+            envelope.classList.add('open');
+            
+            if (audioEnabled) {
+                pianoSynth.start();
+            }
+
+            setTimeout(() => {
+                envelopeSection.style.opacity = '0';
+                envelopeSection.style.transform = 'scale(0.95)';
+                
+                setTimeout(() => {
+                    envelopeSection.classList.add('hidden');
+                    letterSection.classList.remove('hidden');
+                    
+                    setTimeout(() => {
+                        letterCard.classList.add('visible');
+                    }, 50);
+                }, 600);
+
+            }, 900);
+        }
+
+        envelopeWrapper.addEventListener('click', triggerLetterOpen);
+        openBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            triggerLetterOpen();
+        });
+    </script>
+</body>
+</html>
